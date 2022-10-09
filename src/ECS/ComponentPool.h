@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ECSTypes.h"
+#include "Core/ECSTypes.h"
 
 #include <vector>
 

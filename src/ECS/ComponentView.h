@@ -11,7 +11,7 @@ namespace LEnt {
 	public:
 		using ComponentList = TypeList<T...>;
 		using ComponentTuple  = typename ComponentList::TupleType;
-		using PoolTuple = std::tuple<Ref<ComponentPool<T>>...>;
+		using PoolTuple = std::tuple<std::shared_ptr<ComponentPool<T>>...>;
 
 	public:
 		ComponentView(const PoolTuple& pools)
@@ -35,7 +35,7 @@ namespace LEnt {
 			LE_STATIC_ASSERT(ComponentList::Contains<U>, "Template argument is not a component type in this view!");
 			LE_ASSERT(Contains(entity), "View does not contain this entity!");
 
-			Ref<ComponentPool<U>> pool = std::get<ComponentList::Index<U>>(mPools);
+			std::shared_ptr<ComponentPool<U>> pool = std::get<ComponentList::Index<U>>(mPools);
 			return pool->get(entity);
 		}
 
@@ -55,7 +55,7 @@ namespace LEnt {
 		void BuildEntityList()
 		{
 			mValidEntities.clear();
-			Ref<IComponentPool> smallestPool = GetSmallest();
+			std::shared_ptr<IComponentPool> smallestPool = GetSmallest();
 
 			for (EntityID entity : smallestPool)
 			{
@@ -64,10 +64,10 @@ namespace LEnt {
 			}
 		}
 
-		Ref<IComponentPool> GetSmallestImpl(Ref<ComponentPool<T>>... pools)
+		std::shared_ptr<IComponentPool> GetSmallestImpl(std::shared_ptr<ComponentPool<T>>... pools)
 		{
 			usize finalPoolSize = -1;
-			Ref<IComponentPool> pool = nullptr;
+			std::shared_ptr<IComponentPool> pool = nullptr;
 			([&, this]
 			{
 				usize poolSize = pools->size();
@@ -80,12 +80,12 @@ namespace LEnt {
 
 			return pool;
 		}
-		Ref<IComponentPool> GetSmallest()
+		std::shared_ptr<IComponentPool> GetSmallest()
 		{
 			return std::apply(&ComponentView<T...>::GetSmallestImpl, std::tuple_cat(std::make_tuple(this), mPools));
 		}
 
-		bool ValidEntityImpl(Ref<ComponentPool<T>>... pools)
+		bool ValidEntityImpl(std::shared_ptr<ComponentPool<T>>... pools)
 		{
 			bool exists = true;
 			([&, this]
@@ -106,7 +106,7 @@ namespace LEnt {
 		auto& ToTupleElement(EntityID entity)
 		{
 			using ElementType = typename ComponentList::Type<index>;
-			Ref<ComponentPool<ElementType>> pool = std::get<index>(mPools);
+			std::shared_ptr<ComponentPool<ElementType>> pool = std::get<index>(mPools);
 			return pool->get(entity);
 		}
 

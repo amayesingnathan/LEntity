@@ -34,16 +34,4 @@ namespace LEnt {
 		static constexpr i32 u8Max = 255;
 		static constexpr i32 u16Max = 65535;
 	};
-
-	template<typename T>
-	using Single = std::unique_ptr<T>;
-
-	template<typename T, typename ... Args>
-	constexpr inline Single<T> CreateSingle(Args&& ... args)
-	{
-		return std::make_unique<T>(std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	using Ref = std::shared_ptr<T>;
 }

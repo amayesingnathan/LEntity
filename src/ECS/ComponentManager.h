@@ -21,7 +21,7 @@ namespace LEnt {
             LE_ASSERT(!HasComponentPool<T>(), "Component type is already registered!");
 
             mPoolIndices.emplace(Component<T>::Type, mComponentPools.size());
-            mComponentPools.push_back(Ref<ComponentPool<T>>::Create());
+            mComponentPools.push_back(std::shared_ptr<ComponentPool<T>>::Create());
         }
 
         template<typename T, typename... Args>
@@ -30,7 +30,7 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             return pool->insert(entity, std::forward<Args>(args)...);
         }
 
@@ -40,7 +40,7 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             return pool->insert_or_replace(entity, std::forward<Args>(args)...);
         }
 
@@ -50,7 +50,7 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             return pool->replace(entity, std::forward<Args>(args)...);
         }
 
@@ -60,7 +60,7 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             return pool->get(entity);
         }
         template<typename T>
@@ -69,7 +69,7 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             return pool->get(entity);
         }
 
@@ -79,7 +79,7 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             pool->tryDestroy(entity);
         }
 
@@ -89,12 +89,12 @@ namespace LEnt {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
-            Ref<ComponentPool<T>> pool = GetComponentPool<T>();
+            std::shared_ptr<ComponentPool<T>> pool = GetComponentPool<T>();
             return pool->exists(entity);
         }
 
         template<typename T>
-        Ref<ComponentPool<T>> GetComponentPool() const
+        std::shared_ptr<ComponentPool<T>> GetComponentPool() const
         {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
@@ -104,19 +104,19 @@ namespace LEnt {
         }
 
         template<typename... T>
-        std::tuple<Ref<ComponentPool<T>>...> GetComponentPools() const
+        std::tuple<std::shared_ptr<ComponentPool<T>>...> GetComponentPools() const
         {
-            return std::make_tuple<Ref<ComponentPool<T>>...>(ToTupleElement<T>()...);
+            return std::make_tuple<std::shared_ptr<ComponentPool<T>>...>(ToTupleElement<T>()...);
         }
 
         void EntityDestroyed(EntityID entity)
         {
-            for (Ref<IComponentPool> pool : mComponentPools)
+            for (std::shared_ptr<IComponentPool> pool : mComponentPools)
                 pool->tryDestroy(entity);
         };
 
         template<typename T>
-        Ref<ComponentPool<T>> ToTupleElement() const
+        std::shared_ptr<ComponentPool<T>> ToTupleElement() const
         {
             if (!HasComponentPool<T>())
                 RegisterType<T>();
@@ -128,7 +128,7 @@ namespace LEnt {
     private:
         using ComponentIndex = usize;
 
-        mutable std::vector<Ref<IComponentPool>> mComponentPools;
+        mutable std::vector<std::shared_ptr<IComponentPool>> mComponentPools;
         mutable std::unordered_map<ComponentType, ComponentIndex> mPoolIndices;
 
         friend class Registry;

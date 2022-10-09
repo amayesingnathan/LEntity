@@ -11,8 +11,8 @@ namespace LEnt {
     public:
         Registry()
         {
-            mEntityManager = CreateSingle<EntityManager>();
-            mComponentManager = CreateSingle<ComponentManager>();
+            mEntityManager = std::make_unique<EntityManager>();
+            mComponentManager = std::make_unique<ComponentManager>();
         }
 
         EntityID create() { return mEntityManager->Create(); }
@@ -48,8 +48,8 @@ namespace LEnt {
         const T& get(EntityID entity) const { return mComponentManager->GetComponent<T>(entity); }
 
     private:
-        Single<EntityManager> mEntityManager;
-        Single<ComponentManager> mComponentManager;
+        std::unique_ptr<EntityManager> mEntityManager;
+        std::unique_ptr<ComponentManager> mComponentManager;
     };
 
 }
