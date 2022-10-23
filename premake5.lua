@@ -26,3 +26,4 @@ workspace "LEntity"
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 include "LEntity"
+include "Testbed"
