@@ -3,8 +3,6 @@
 #include "Base.h"
 #include "Reflection.h"
 
-#include <string_view>
-
 namespace LEnt {
 
     using EntityID = i16;

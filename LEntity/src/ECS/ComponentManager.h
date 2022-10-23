@@ -2,8 +2,6 @@
 
 #include "ComponentPool.h"
 
-#include <unordered_map>
-
 namespace LEnt {
 
     class ComponentManager

@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string_view>
-#include <functional>
-
 #if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
 #    define LE_FUNC_SIGNATURE __PRETTY_FUNCTION__
 #    define LE_FUNC_SIGNATURE_PREFIX '='

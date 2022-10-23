@@ -2,8 +2,6 @@
 
 #include "Core/ECSTypes.h"
 
-#include <vector>
-
 namespace LEnt {
     
     class IComponentPool
