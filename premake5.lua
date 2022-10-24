@@ -25,5 +25,8 @@ workspace "LEntity"
 
 outputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["LEntity"] 	= "%{wks.location}/LEntity/src"
+
 include "LEntity"
 include "Testbed"

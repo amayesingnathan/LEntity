@@ -11,6 +11,11 @@ project "Testbed"
         "**.h", 
         "**.cpp",
     }
+    
+    includedirs
+    {
+        "%{IncludeDir.LEntity}",
+    }
 	
 	defines
 	{

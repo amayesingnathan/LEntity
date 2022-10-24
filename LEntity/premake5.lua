@@ -21,7 +21,7 @@ project "LEntity"
 
     includedirs
     {
-        "src",
+        "%{IncludeDir.LEntity}",
     }
 
 	links
