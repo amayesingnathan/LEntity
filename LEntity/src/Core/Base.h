@@ -4,8 +4,8 @@
 
 namespace LEnt {
 
-#define LE_ASSERT(condition) assert(condition);
-#define LE_STATIC_ASSERT(...) static_assert(__VA_ARGS__);
+#define LE_ASSERT(x, ...) assert(x)
+#define LE_STATIC_ASSERT(...) static_assert(__VA_ARGS__)
 
 	using i8 = signed char;
 	using i16 = short;
