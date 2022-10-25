@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/ECSTypes.h"
+#include "Containers/PackedSet.h"
 
 namespace LEnt {
 
@@ -9,15 +10,12 @@ namespace LEnt {
     public:
         EntityManager()
         {
-            mAvailableIDs.reserve(MAX_ENTITIES);
             mAvailableIDs.emplace_back(0);
         }
 
     private:
         EntityID Create()
         {
-            LE_ASSERT(mEntityCount < MAX_ENTITIES); // Max entities reached!
-
             usize size = mAvailableIDs.size();
             LE_ASSERT(size > 0); // Error! Available IDs was empty!
 
@@ -36,14 +34,14 @@ namespace LEnt {
 
         void Destroy(EntityID entity)
         {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES); // Invalid entity!;
+            LE_ASSERT(entity >= 0); // Invalid entity!;
 
             mAvailableIDs.push_back(entity);
             --mEntityCount;
         }
 
     private:
-        std::vector<EntityID> mAvailableIDs;
+        PackedSet<EntityID> mAvailableIDs;
         usize mEntityCount = 0;
 
         friend class Registry;

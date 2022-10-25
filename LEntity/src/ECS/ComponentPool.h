@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Core/ECSTypes.h"
+#include "Containers/PackedSet.h"
+#include "Containers/SparseSet.h"
 
 namespace LEnt {
     
@@ -12,10 +14,8 @@ namespace LEnt {
         virtual bool exists(EntityID entity) const = 0;
         virtual usize size() const = 0;
 
-        virtual std::vector<EntityID>::iterator begin() = 0;
-        virtual std::vector<EntityID>::const_iterator begin() const = 0;
-        virtual std::vector<EntityID>::iterator end() = 0;
-        virtual std::vector<EntityID>::const_iterator end() const = 0;
+        virtual PackedSet<EntityID>::Iterator begin() = 0;
+        virtual PackedSet<EntityID>::Iterator end() = 0;
     };
     
     template<typename T>
@@ -24,14 +24,13 @@ namespace LEnt {
     public:
         ComponentPool()
         {
-            mEntityIndices.fill(-1);
         }
     
     private:
         template<typename... Args>
         T& insert(EntityID entity, Args&&... args)
         {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES);
+            LE_ASSERT(entity >= 0);
             LE_ASSERT(!exists(entity));
 
             return AddInternal(entity, std::forward<Args>(args)...);
@@ -39,14 +38,14 @@ namespace LEnt {
         template<typename... Args>
         T& insert_or_replace(EntityID entity, Args&&... args)
         {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES);
+            LE_ASSERT(entity >= 0);
 
             return AddInternal(entity, std::forward<Args>(args)...);
         }
         template<typename... Args>
         T& replace(EntityID entity, Args&&... args)
         {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES);
+            LE_ASSERT(entity >= 0);
             LE_ASSERT(exists(entity));
 
             return AddInternal(entity, std::forward<Args>(args)...);
@@ -54,7 +53,7 @@ namespace LEnt {
         
         void tryDestroy(EntityID entity) override
         {
-            if (entity < 0 || entity > MAX_ENTITIES)
+            if (entity < 0)
                 return; // Invalid entity
             
             // Get index of entity to destroy in Entity/Component lists. 
@@ -81,42 +80,20 @@ namespace LEnt {
             mEntityList.pop_back();
             mComponentList.pop_back();
         };
-        
-        T& get(EntityID entity)
-        {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES, "Invalid entity!");
-            
-            i32 index = mEntityIndices[(usize)entity];
-            LE_ASSERT(index >= 0, "Entity does not have component!");
-            LE_ASSERT(index < mComponentList.size(), "Internal error! Returned index is greater than number of components in pool");
 
-            usize uindex = (usize)index;
-            return mComponentList[uindex];
-        }
-        const T& get(EntityID entity) const
-        {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES, "Invalid entity!");
-
-            i32 index = mEntityIndices[(usize)entity];
-            LE_ASSERT(index >= 0, "Entity does not have component!");
-            LE_ASSERT(index < mComponentList.size(), "Internal error! Returned index is greater than number of components in pool");
-
-            usize uindex = (usize)index;
-            return mComponentList[uindex];
-        }
+        T& get(EntityID entity) { return GetInternal(entity); }
+        const T& get(EntityID entity) const { return GetInternal(entity); }
 
         bool exists(EntityID entity) const override
         {
-            LE_ASSERT(entity >= 0 && entity < MAX_ENTITIES, "Invalid entity!");
+            LE_ASSERT(entity >= 0, "Invalid entity!");
             return mEntityIndices[(usize)entity] >= 0;
         }
 
         usize size() const override { return mEntityList.size(); }
 
-        std::vector<EntityID>::iterator begin() override { return mEntityList.begin(); }
-        std::vector<EntityID>::const_iterator begin() const override { return mEntityList.cbegin(); }
-        std::vector<EntityID>::iterator end() override { return mEntityList.end(); }
-        std::vector<EntityID>::const_iterator end() const override { return mEntityList.cend(); }
+        PackedSet<EntityID>::Iterator begin() override { return mEntityList.begin(); }
+        PackedSet<EntityID>::Iterator end() override { return mEntityList.end(); }
 
     private:
         template<typename... Args>
@@ -127,11 +104,22 @@ namespace LEnt {
             mComponentList.emplace_back(std::forward<Args>(args)...);
             return mComponentList.back();
         }
+
+        T& GetInternal(EntityID entity) const
+        {
+            LE_ASSERT(entity >= 0, "Invalid entity!");
+
+            i32 index = mEntityIndices[entity];
+            LE_ASSERT(index >= 0, "Entity does not have component!");
+            LE_ASSERT(index < mComponentList.size(), "Internal error! Returned index is greater than number of components in pool!");
+
+            return mComponentList[index];
+        }
     
     private:
-        std::array<i32, MAX_ENTITIES> mEntityIndices;
-        std::vector<EntityID> mEntityList;
-        std::vector<T> mComponentList;
+        SparseSet<i32> mEntityIndices;
+        PackedSet<EntityID> mEntityList;
+        PackedSet<T> mComponentList;
         
         friend class ComponentManager;
         template<typename... T>

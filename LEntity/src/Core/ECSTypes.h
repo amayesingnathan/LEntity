@@ -5,8 +5,7 @@
 
 namespace LEnt {
 
-    using EntityID = i16;
-    constexpr EntityID MAX_ENTITIES = Limits::i16Max;
+    using EntityID = i32;
     constexpr EntityID NullEnt = -1;
 
     using ComponentType = std::string_view;
