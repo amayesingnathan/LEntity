@@ -37,7 +37,7 @@ namespace LEnt {
                 AddPage(pageIndex);
 
             T* page = mPages[pageIndex];
-            LE_ASSERT(data, "Page is not valid memory!");
+            LE_ASSERT(page, "Page is not valid memory!");
 
             T* target = page + localIndex;
             LE_ASSERT(target, "Located index is not valid memory!");
@@ -47,9 +47,11 @@ namespace LEnt {
 
         void AddPage(usize pageIndex) const
         {
-            auto& [index, page] = mPages.try_emplace(pageIndex, nullptr);
-            page = (T*)::operator new(PageSize);
-            memset(page, 0xff, PageSize);
+            auto result = mPages.try_emplace(pageIndex, nullptr);
+            LE_ASSERT(result.second, "Failed to add new page");
+
+            result.first->second = (T*)::operator new(PageSize);
+            memset(result.first->second, 0xff, PageSize);
         }
 
     private:
