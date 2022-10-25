@@ -23,15 +23,15 @@ namespace LEnt {
 
         PackedSetIterator& operator++()
         {
-            usize traversed = mPtr - (TypePtr)mPage.memBlock;
-            if (traversed < PageLen)
+            usize traversed = mPtr - mPage->memBlock;
+            if (traversed < PageLen - 1)
             {
                 mPtr++;
                 return *this;
             }
 
             mPage++;
-            mPtr = (TypePtr)mPage.memBlock;
+            mPtr = mPage->memBlock;
             return *this;
         }
         PackedSetIterator operator++(int) const
@@ -43,7 +43,7 @@ namespace LEnt {
 
         PackedSetIterator& operator--()
         {
-            usize traversed = mPtr - (TypePtr)mPage.memBlock;
+            usize traversed = mPtr - mPage->memBlock;
             if (traversed > 0)
             {
                 mPtr--;
@@ -51,7 +51,7 @@ namespace LEnt {
             }
 
             mPage--;
-            mPtr = (TypePtr)mPage.memBlock + (PageLen - 1);
+            mPtr = mPage->memBlock + (PageLen - 1);
             return *this;
         }
         PackedSetIterator operator--(int) const
@@ -63,14 +63,14 @@ namespace LEnt {
 
         PackedSetIterator& operator+=(usize offset)
         {
-            usize traversed = mPtr - (TypePtr)mPage.memBlock;
+            usize traversed = mPtr - mPage->memBlock;
             while (traversed + offset > PageLen)
             {
                 mPage++;
                 offset -= PageLen;
             }
 
-            mPtr = (TypePtr)mPage.memBlock + traversed + offset;
+            mPtr = mPage->memBlock + traversed + offset;
             return *this;
         }
         PackedSetIterator operator+(usize offset) const
@@ -81,14 +81,14 @@ namespace LEnt {
         }
         PackedSetIterator operator-=(usize offset)
         {
-            usize traversed = mPtr - (TypePtr)mPage.memBlock;
+            usize traversed = mPtr - mPage->memBlock;
             while (traversed > offset)
             {
                 mPage--;
                 offset -= PageLen;
             }
 
-            mPtr = (TypePtr)mPage.memBlock + traversed - offset;
+            mPtr = mPage->memBlock + traversed - offset;
             return *this;
         }
         PackedSetIterator operator-(usize offset) const
@@ -143,12 +143,14 @@ namespace LEnt {
         {
             mPtr = nullptr;
             mPage = nullptr;
+            mFinalPage = nullptr;
             return *this;
         }
 
     private:
         TypePtr mPtr;
         PagePtr mPage;
+        PagePtr mFinalPage;
     };
 
     template<typename T>
@@ -164,9 +166,10 @@ namespace LEnt {
         struct Page
         {
             TypePtr memBlock = nullptr;
+            usize used = 0;
         };
 
-    private:
+    public:
         static constexpr usize PageSize = 1024;
         static constexpr usize ElementsPerPage = PageSize / sizeof(TypeVal);
 
@@ -185,19 +188,20 @@ namespace LEnt {
         TypeRef emplace_back(Args&&... args)
         {
             usize pageIndex = mSize / ElementsPerPage;
-            usize localIndex = mSize - (ElementsPerPage * pageIndex);
-
-            if (pageIndex >= mPages.size())
-                AddPage();
+            LE_ASSERT(pageIndex < mPages.size(), "No page for this index!");
 
             Page& page = mPages[pageIndex];
             LE_ASSERT(page.memBlock, "Page is not valid memory!");
+            LE_ASSERT(page.used < ElementsPerPage, "Page has no room for new entries!");
 
-            TypePtr target = page.memBlock + localIndex;
-            LE_ASSERT(target, "Located index is not valid memory!");
+            TypePtr target = page.memBlock + page.used;
+            new (target) T(std::forward<Args>(args)...);
 
-            new (target) TypeVal(std::forward<Args>(args)...);
             mSize++;
+            page.used++;
+
+            if (page.used == ElementsPerPage)
+                AddPage();
 
             return *target;
         }
@@ -206,17 +210,17 @@ namespace LEnt {
 
         void pop_back()
         {
-            mSize--;
-            usize pageIndex = mSize / ElementsPerPage;
-            usize localIndex = mSize - (ElementsPerPage * pageIndex);
+            usize pageIndex = (mSize - 1) / ElementsPerPage;
 
-            Page & page = mPages[pageIndex];
+            Page& page = mPages[pageIndex];
             LE_ASSERT(page.memBlock, "Page is not valid memory!");
+            LE_ASSERT(page.used > 0, "Page has no entries to pop!");
 
-            TypePtr target = page.memBlock + localIndex;
-            LE_ASSERT(target, "Located index is not valid memory!");
+            mSize--;
+            page.used--;
 
-            target->~TypeVal();
+            TypePtr target = page.memBlock + page.used;
+            target->~T();
         }
 
         void clear()
@@ -228,17 +232,15 @@ namespace LEnt {
             mSize = 0;
         }
 
-        void size() const { return mSize; }
+        usize size() const { return mSize; }
 
         TypeRef operator[](usize index) { return GetElement(index); }
         TypeRef operator[](i32 index) { return GetElement((usize)index); }
         const TypeRef operator[](usize index) const { return GetElement(index); }
         const TypeRef operator[](i32 index) const { return GetElement((usize)index); }
 
-        TypeRef back()
-        {
-            return GetElement(mSize - 1);
-        }
+        TypeRef back() { return GetElement(mSize - 1); }
+        const TypeRef back() const { return GetElement(mSize - 1); }
 
         Iterator begin()
         {
@@ -256,8 +258,16 @@ namespace LEnt {
             Page& firstPage = mPages[0];
             return Iterator(firstPage.memBlock, &firstPage);
         }
-        Iterator end() { return Iterator(nullptr, nullptr); }
-        const Iterator end() const { return Iterator(nullptr, nullptr); }
+        Iterator end()
+        {
+            Page& endPage = mPages.back();
+            return Iterator(endPage.memBlock + endPage.used, &endPage);
+        }
+        const Iterator end() const
+        {
+            const Page& endPage = mPages.back();
+            return Iterator(endPage.memBlock + endPage.used, &endPage);
+        }
 
     private:
         void AddPage()
@@ -266,14 +276,14 @@ namespace LEnt {
             newPage.memBlock = (TypePtr)::operator new(PageSize);
         }
 
-        TypeRef GetElement(usize index)
+        TypeRef GetElement(usize index) const
         {
             usize pageIndex = index / ElementsPerPage;
             usize localIndex = index - (ElementsPerPage * pageIndex);
 
             LE_ASSERT(pageIndex < mPages.size(), "No page for this index!");
 
-            Page& page = mPages[pageIndex];
+            const Page& page = mPages[pageIndex];
             LE_ASSERT(page.memBlock, "Page is not valid memory!");
 
             TypePtr target = page.memBlock + localIndex;
