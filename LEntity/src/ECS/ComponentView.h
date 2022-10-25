@@ -57,7 +57,7 @@ namespace LEnt {
 			mValidEntities.clear();
 			std::shared_ptr<IComponentPool> smallestPool = GetSmallest();
 
-			for (EntityID entity : smallestPool)
+			for (EntityID entity : *smallestPool)
 			{
 				if (ValidEntity(entity))
 					mValidEntities.push_back(entity);

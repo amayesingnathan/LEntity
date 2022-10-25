@@ -19,7 +19,7 @@ namespace LEnt {
             LE_ASSERT(!HasComponentPool<T>(), "Component type is already registered!");
 
             mPoolIndices.emplace(Component<T>::Type, mComponentPools.size());
-            mComponentPools.push_back(std::shared_ptr<ComponentPool<T>>::Create());
+            mComponentPools.push_back(std::make_shared<ComponentPool<T>>());
         }
 
         template<typename T, typename... Args>
@@ -98,7 +98,7 @@ namespace LEnt {
                 RegisterType<T>();
 
             ComponentIndex poolIndex = mPoolIndices.at(Component<T>::Type);
-            return mComponentPools[poolIndex];
+            return std::dynamic_pointer_cast<ComponentPool<T>>(mComponentPools[poolIndex]);
         }
 
         template<typename... T>
@@ -120,7 +120,7 @@ namespace LEnt {
                 RegisterType<T>();
 
             ComponentIndex poolIndex = mPoolIndices.at(Component<T>::Type);
-            return mComponentPools[poolIndex];
+            return std::dynamic_pointer_cast<ComponentPool<T>>(mComponentPools[poolIndex]);
         }
 
     private:
