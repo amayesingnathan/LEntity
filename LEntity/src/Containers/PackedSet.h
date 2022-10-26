@@ -143,14 +143,12 @@ namespace LEnt {
         {
             mPtr = nullptr;
             mPage = nullptr;
-            mFinalPage = nullptr;
             return *this;
         }
 
     private:
         TypePtr mPtr;
         PagePtr mPage;
-        PagePtr mFinalPage;
     };
 
     template<typename T>
