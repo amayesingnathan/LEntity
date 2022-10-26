@@ -10,6 +10,27 @@ namespace LEnt {
         ComponentManager() = default;
 
     private:
+        void ClearAll()
+        {
+            for (auto pool : mComponentPools)
+                pool->clear();
+        }
+
+        template<typename... T>
+        void Clear()
+        {
+            if constexpr (sizeof...(T) == 0)
+            {
+                ClearAll();
+                return;
+            }
+
+            ([this]()
+            {
+                GetComponentPool<T>()->clear();
+            }(), ...);
+        }
+
         template<typename T>
         bool HasComponentPool() const { return mPoolIndices.count(Component<T>::Type) != 0; }
 

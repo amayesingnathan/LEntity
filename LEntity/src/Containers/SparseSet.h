@@ -15,10 +15,21 @@ namespace LEnt {
         SparseSet() = default;
         ~SparseSet()
         {
+            clear();
+        }
+
+        void clear()
+        {
             for (auto& [index, page] : mPages)
                 ::operator delete(page);
 
             mPages.clear();
+        }
+
+        void reset()
+        {
+            for (auto& [pageIndex, memBlock] : mPages)
+                memset(memBlock, 0xff, PageSize);
         }
 
     public:

@@ -40,6 +40,36 @@ namespace LEnt {
             --mEntityCount;
         }
 
+        void Clear()
+        {
+            mAvailableIDs.clear();
+            mEntityCount = 0;
+        }
+
+        template<typename Func>
+        void ForEach(Func func)
+        {
+            std::vector<EntityID> entities;
+            GetActiveEntities(entities);
+
+            for (EntityID entity : entities)
+                func(entity);
+        }
+
+        void GetActiveEntities(std::vector<EntityID>& entities)
+        {
+            EntityID maxEntity = *std::max_element(mAvailableIDs.begin(), mAvailableIDs.end());
+            entities.reserve(maxEntity);
+
+            for (EntityID i = 0; i < maxEntity; i++)
+                entities.emplace_back(i);
+
+            entities.erase(std::remove_if(entities.begin(), entities.end(), [&, this](EntityID id)
+            {
+                return mAvailableIDs.find(id) == mAvailableIDs.end();
+            }), entities.end());
+        }
+
     private:
         PackedSet<EntityID> mAvailableIDs;
         usize mEntityCount = 0;

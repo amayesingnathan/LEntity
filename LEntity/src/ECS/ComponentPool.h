@@ -13,6 +13,7 @@ namespace LEnt {
         virtual void tryDestroy(EntityID entity) = 0;
         virtual bool exists(EntityID entity) const = 0;
         virtual usize size() const = 0;
+        virtual void clear() = 0;
 
         virtual PackedSet<EntityID>::Iterator begin() = 0;
         virtual PackedSet<EntityID>::Iterator end() = 0;
@@ -91,6 +92,13 @@ namespace LEnt {
         }
 
         usize size() const override { return mEntityList.size(); }
+
+        void clear() override 
+        { 
+            mEntityIndices.clear();
+            mEntityList.clear();
+            mComponentList.clear();
+        }
 
         PackedSet<EntityID>::Iterator begin() override { return mEntityList.begin(); }
         PackedSet<EntityID>::Iterator end() override { return mEntityList.end(); }

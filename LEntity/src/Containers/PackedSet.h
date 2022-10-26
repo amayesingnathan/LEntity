@@ -34,10 +34,10 @@ namespace LEnt {
             mPtr = mPage->memBlock;
             return *this;
         }
-        PackedSetIterator operator++(int) const
+        PackedSetIterator operator++(int)
         {
             PackedSetIterator tmp = *this;
-            tmp++;
+            ++(*this);
             return tmp;
         }
 
@@ -54,10 +54,10 @@ namespace LEnt {
             mPtr = mPage->memBlock + (PageLen - 1);
             return *this;
         }
-        PackedSetIterator operator--(int) const
+        PackedSetIterator operator--(int)
         {
             PackedSetIterator tmp = *this;
-            tmp--;
+            --(*this);
             return tmp;
         }
 
@@ -266,6 +266,17 @@ namespace LEnt {
             const Page& endPage = mPages.back();
             return Iterator(endPage.memBlock + endPage.used, &endPage);
         }
+
+        Iterator find(Iterator begin, Iterator end, const TypeRef val)
+        {
+            for (Iterator it = begin; it != end; ++it)
+            {
+                if (*it == val)
+                    return it;
+            }
+            return end;
+        }
+        Iterator find(const TypeRef val) { return find(begin(), end(), val); }
 
     private:
         void AddPage()

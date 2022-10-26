@@ -39,6 +39,9 @@ namespace LEnt {
             return ComponentView<Component...>(pools);
         }
 
+        template<typename Func>
+        void each(Func func) { return mEntityManager->ForEach(func); }
+
         template<typename T>
         bool all_of(EntityID entity) const { return mComponentManager->HasComponent<T>(entity); }
 
@@ -46,6 +49,15 @@ namespace LEnt {
         T& get(EntityID entity) { return mComponentManager->GetComponent<T>(entity); }
         template<typename T>
         const T& get(EntityID entity) const { return mComponentManager->GetComponent<T>(entity); }
+
+        template<typename... Components>
+        void clear()
+        {
+            if constexpr (sizeof...(Components) == 0)
+                mEntityManager->Clear();
+
+            mComponentManager->Clear<Components...>();
+        }
 
     private:
         std::unique_ptr<EntityManager> mEntityManager;
