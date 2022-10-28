@@ -15,6 +15,7 @@ project "Testbed"
     includedirs
     {
         "%{IncludeDir.LEntity}",
+        "dependencies",
     }
 	
 	defines
