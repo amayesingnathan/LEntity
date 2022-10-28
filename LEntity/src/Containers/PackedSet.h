@@ -23,6 +23,8 @@ namespace LEnt {
 
         PackedSetIterator& operator++()
         {
+            LE_PROFILE_FUNCTION();
+
             usize traversed = mPtr - mPage->memBlock;
             if (traversed < PageLen - 1)
             {
@@ -36,6 +38,8 @@ namespace LEnt {
         }
         PackedSetIterator operator++(int)
         {
+            LE_PROFILE_FUNCTION();
+
             PackedSetIterator tmp = *this;
             ++(*this);
             return tmp;
@@ -43,6 +47,8 @@ namespace LEnt {
 
         PackedSetIterator& operator--()
         {
+            LE_PROFILE_FUNCTION();
+
             usize traversed = mPtr - mPage->memBlock;
             if (traversed > 0)
             {
@@ -63,6 +69,8 @@ namespace LEnt {
 
         PackedSetIterator& operator+=(usize offset)
         {
+            LE_PROFILE_FUNCTION();
+
             usize traversed = mPtr - mPage->memBlock;
             while (traversed + offset > PageLen)
             {
@@ -81,6 +89,8 @@ namespace LEnt {
         }
         PackedSetIterator operator-=(usize offset)
         {
+            LE_PROFILE_FUNCTION();
+
             usize traversed = mPtr - mPage->memBlock;
             while (traversed > offset)
             {
@@ -100,6 +110,8 @@ namespace LEnt {
 
         usize operator-(const PackedSetIterator& rhs) const
         {
+            LE_PROFILE_FUNCTION();
+
             LE_ASSERT(mPage >= rhs.mPage);
             if (mPage == rhs.mPage)
                 LE_ASSERT(mPtr >= rhs.mPtr);
@@ -182,6 +194,8 @@ namespace LEnt {
         template<typename... Args>
         TypeRef emplace_back(Args&&... args)
         {
+            LE_PROFILE_FUNCTION();
+
             if (mSize == 0)
                 AddPage();
 
@@ -208,6 +222,8 @@ namespace LEnt {
 
         void pop_back()
         {
+            LE_PROFILE_FUNCTION();
+
             usize pageIndex = (mSize - 1) / ElementsPerPage;
 
             Page& page = mPages[pageIndex];
@@ -223,6 +239,8 @@ namespace LEnt {
 
         void clear()
         {
+            LE_PROFILE_FUNCTION();
+
             for (Page& page : mPages)
                 ::operator delete(page.memBlock);
 
@@ -269,6 +287,8 @@ namespace LEnt {
 
         Iterator find(Iterator begin, Iterator end, const TypeRef val)
         {
+            LE_PROFILE_FUNCTION();
+
             for (Iterator it = begin; it != end; ++it)
             {
                 if (*it == val)
@@ -281,12 +301,16 @@ namespace LEnt {
     private:
         void AddPage()
         {
+            LE_PROFILE_FUNCTION();
+
             Page& newPage = mPages.emplace_back();
             newPage.memBlock = (TypePtr)::operator new(PageSize);
         }
 
         TypeRef GetElement(usize index) const
         {
+            LE_PROFILE_FUNCTION();
+
             usize pageIndex = index / ElementsPerPage;
             usize localIndex = index - (ElementsPerPage * pageIndex);
 

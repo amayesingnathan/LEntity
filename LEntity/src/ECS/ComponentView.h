@@ -49,11 +49,15 @@ namespace LEnt {
 	private:
 		bool Contains(EntityID entity) const
 		{
+			LE_PROFILE_FUNCTION();
+
 			return std::find(mValidEntities.begin(), mValidEntities.end(), entity) != mValidEntities.end();
 		}
 
 		void BuildEntityList()
 		{
+			LE_PROFILE_FUNCTION();
+
 			mValidEntities.clear();
 			std::shared_ptr<IComponentPool> smallestPool = GetSmallest();
 
@@ -82,6 +86,8 @@ namespace LEnt {
 		}
 		std::shared_ptr<IComponentPool> GetSmallest()
 		{
+			LE_PROFILE_FUNCTION();
+
 			return std::apply(&ComponentView<T...>::GetSmallestImpl, std::tuple_cat(std::make_tuple(this), mPools));
 		}
 
@@ -98,6 +104,8 @@ namespace LEnt {
 		}
 		bool ValidEntity(EntityID entity)
 		{
+			LE_PROFILE_FUNCTION();
+
 			mCheckEntity = entity;
 			return std::apply(&ComponentView<T...>::ValidEntityImpl, std::tuple_cat(std::make_tuple(this), mPools));
 		}
@@ -113,7 +121,12 @@ namespace LEnt {
 		template <usize... Is>
 		auto GenTupleImpl(EntityID entity, std::index_sequence<Is...>) { return std::tie(ToTupleElement<Is>(entity)...); }
 
-		auto GenTuple(EntityID entity) { return GenTupleImpl(entity, std::make_index_sequence<ComponentList::Size>{}); }
+		auto GenTuple(EntityID entity) 
+		{
+			LE_PROFILE_FUNCTION();
+
+			return GenTupleImpl(entity, std::make_index_sequence<ComponentList::Size>{}); 
+		}
 
 	private:
 		PoolTuple mPools;

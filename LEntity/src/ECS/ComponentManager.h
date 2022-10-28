@@ -12,6 +12,8 @@ namespace LEnt {
     private:
         void ClearAll()
         {
+            LE_PROFILE_FUNCTION();
+
             for (auto pool : mComponentPools)
                 pool->clear();
         }

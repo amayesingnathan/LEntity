@@ -54,6 +54,8 @@ namespace LEnt {
         
         void tryDestroy(EntityID entity) override
         {
+            LE_PROFILE_FUNCTION();
+
             if (entity < 0)
                 return; // Invalid entity
             
@@ -107,6 +109,8 @@ namespace LEnt {
         template<typename... Args>
         T& AddInternal(EntityID entity, Args&&... args)
         {
+            LE_PROFILE_FUNCTION();
+
             mEntityIndices[(usize)entity] = (i32)mEntityList.size();
             mEntityList.push_back(entity);
             mComponentList.emplace_back(std::forward<Args>(args)...);
@@ -115,6 +119,8 @@ namespace LEnt {
 
         T& GetInternal(EntityID entity) const
         {
+            LE_PROFILE_FUNCTION();
+
             LE_ASSERT(entity >= 0, "Invalid entity!");
 
             i32 index = mEntityIndices[entity];

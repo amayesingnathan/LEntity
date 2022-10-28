@@ -16,6 +16,8 @@ namespace LEnt {
     private:
         EntityID Create()
         {
+            LE_PROFILE_FUNCTION();
+
             usize size = mAvailableIDs.size();
             LE_ASSERT(size > 0); // Error! Available IDs was empty!
 
@@ -34,6 +36,8 @@ namespace LEnt {
 
         void Destroy(EntityID entity)
         {
+            LE_PROFILE_FUNCTION();
+
             LE_ASSERT(entity >= 0); // Invalid entity!;
 
             mAvailableIDs.push_back(entity);
@@ -42,6 +46,8 @@ namespace LEnt {
 
         void Clear()
         {
+            LE_PROFILE_FUNCTION();
+
             mAvailableIDs.clear();
             mAvailableIDs.emplace_back(0);
             mEntityCount = 0;
@@ -50,6 +56,8 @@ namespace LEnt {
         template<typename Func>
         void ForEach(Func func)
         {
+            LE_PROFILE_FUNCTION();
+
             std::vector<EntityID> entities;
             GetActiveEntities(entities);
 
@@ -59,6 +67,8 @@ namespace LEnt {
 
         void GetActiveEntities(std::vector<EntityID>& entities)
         {
+            LE_PROFILE_FUNCTION();
+
             EntityID maxEntity = *std::max_element(mAvailableIDs.begin(), mAvailableIDs.end());
             entities.reserve(maxEntity);
 

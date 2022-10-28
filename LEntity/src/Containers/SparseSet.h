@@ -20,6 +20,8 @@ namespace LEnt {
 
         void clear()
         {
+            LE_PROFILE_FUNCTION();
+
             for (auto& [index, page] : mPages)
                 ::operator delete(page);
 
@@ -28,6 +30,8 @@ namespace LEnt {
 
         void reset()
         {
+            LE_PROFILE_FUNCTION();
+
             for (auto& [pageIndex, memBlock] : mPages)
                 memset(memBlock, 0xff, PageSize);
         }
@@ -41,6 +45,8 @@ namespace LEnt {
     private:
         T& GetElement(usize index) const
         {
+            LE_PROFILE_FUNCTION();
+
             usize pageIndex = index / ElementsPerPage;
             usize localIndex = index - (ElementsPerPage * pageIndex);
 
@@ -58,6 +64,8 @@ namespace LEnt {
 
         void AddPage(usize pageIndex) const
         {
+            LE_PROFILE_FUNCTION();
+
             auto result = mPages.try_emplace(pageIndex, nullptr);
             LE_ASSERT(result.second, "Failed to add new page");
 
