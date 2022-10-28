@@ -43,6 +43,7 @@ namespace LEnt {
         void Clear()
         {
             mAvailableIDs.clear();
+            mAvailableIDs.emplace_back(0);
             mEntityCount = 0;
         }
 

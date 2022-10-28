@@ -172,10 +172,7 @@ namespace LEnt {
         static constexpr usize ElementsPerPage = PageSize / sizeof(TypeVal);
 
     public:
-        PackedSet()
-        {
-            AddPage();
-        }
+        PackedSet() = default;
         ~PackedSet()
         {
             clear();
@@ -185,8 +182,11 @@ namespace LEnt {
         template<typename... Args>
         TypeRef emplace_back(Args&&... args)
         {
+            if (mSize == 0)
+                AddPage();
+
             usize pageIndex = mSize / ElementsPerPage;
-            LE_ASSERT(pageIndex < mPages.size(), "No page for this index!");
+            LE_ASSERT(pageIndex <= mPages.size(), "No page for this index!");
 
             Page& page = mPages[pageIndex];
             LE_ASSERT(page.memBlock, "Page is not valid memory!");
