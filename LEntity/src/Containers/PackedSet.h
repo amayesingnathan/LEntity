@@ -206,7 +206,7 @@ namespace LEnt {
                 AddPage();
 
             usize pageIndex = mSize / ElementsPerPage;
-            LE_ASSERT(pageIndex <= mPages.size(), "No page for this index!");
+            LE_ASSERT(pageIndex < mPages.size(), "No page for this index!");
 
             Page& page = mPages[pageIndex];
             LE_ASSERT(page.memBlock, "Page is not valid memory!");
