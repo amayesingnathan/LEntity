@@ -186,8 +186,8 @@ namespace LEnt {
         };
 
     public:
-        static constexpr usize PageSize = 1024;
-        static constexpr usize ElementsPerPage = PageSize / sizeof(TypeVal);
+        static constexpr usize ElementsPerPage = 1024;
+        static constexpr usize PageSize = ElementsPerPage * sizeof(TypeVal);
 
     public:
         PackedSet() = default;

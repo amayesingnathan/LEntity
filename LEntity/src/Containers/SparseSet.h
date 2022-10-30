@@ -8,8 +8,8 @@ namespace LEnt {
     class SparseSet
     {
     private:
-        static constexpr usize PageSize = 4096;
-        static constexpr usize ElementsPerPage = PageSize / sizeof(T);
+        static constexpr usize ElementsPerPage = 4096;
+        static constexpr usize PageSize = ElementsPerPage * sizeof(T);
 
     public:
         SparseSet() = default;
