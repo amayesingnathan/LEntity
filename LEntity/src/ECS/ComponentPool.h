@@ -23,10 +23,7 @@ namespace LEnt {
     class ComponentPool : public IComponentPool
     {
     public:
-        ComponentPool()
-        {
-        }
-    
+        ComponentPool() = default;
     private:
         template<typename... Args>
         T& insert(EntityID entity, Args&&... args)
@@ -89,6 +86,8 @@ namespace LEnt {
 
         bool exists(EntityID entity) const override
         {
+            LE_PROFILE_FUNCTION();
+
             LE_ASSERT(entity >= 0, "Invalid entity!");
             return mEntityIndices[(usize)entity] >= 0;
         }
@@ -96,7 +95,9 @@ namespace LEnt {
         usize size() const override { return mEntityList.size(); }
 
         void clear() override 
-        { 
+        {
+            LE_PROFILE_FUNCTION();
+
             mEntityIndices.clear();
             mEntityList.clear();
             mComponentList.clear();

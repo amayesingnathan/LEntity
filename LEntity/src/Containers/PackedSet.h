@@ -62,6 +62,8 @@ namespace LEnt {
         }
         PackedSetIterator operator--(int)
         {
+            LE_PROFILE_FUNCTION();
+
             PackedSetIterator tmp = *this;
             --(*this);
             return tmp;
@@ -83,6 +85,8 @@ namespace LEnt {
         }
         PackedSetIterator operator+(usize offset) const
         {
+            LE_PROFILE_FUNCTION();
+
             PackedSetIterator it = *this;
             it += offset;
             returh it;
@@ -103,6 +107,8 @@ namespace LEnt {
         }
         PackedSetIterator operator-(usize offset) const
         {
+            LE_PROFILE_FUNCTION();
+
             PackedSetIterator it = *this;
             it -= offset;
             return it;
@@ -260,6 +266,8 @@ namespace LEnt {
 
         Iterator begin()
         {
+            LE_PROFILE_FUNCTION();
+
             if (mSize == 0)
                 return end();
 
@@ -268,6 +276,8 @@ namespace LEnt {
         }
         const Iterator begin() const
         {
+            LE_PROFILE_FUNCTION();
+
             if (mSize == 0)
                 return end();
 
@@ -276,11 +286,15 @@ namespace LEnt {
         }
         Iterator end()
         {
+            LE_PROFILE_FUNCTION();
+
             Page& endPage = mPages.back();
             return Iterator(endPage.memBlock + endPage.used, &endPage);
         }
         const Iterator end() const
         {
+            LE_PROFILE_FUNCTION();
+
             const Page& endPage = mPages.back();
             return Iterator(endPage.memBlock + endPage.used, &endPage);
         }

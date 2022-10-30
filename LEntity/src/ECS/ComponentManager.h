@@ -21,6 +21,8 @@ namespace LEnt {
         template<typename... T>
         void Clear()
         {
+            LE_PROFILE_FUNCTION();
+
             if constexpr (sizeof...(T) == 0)
             {
                 ClearAll();
@@ -34,11 +36,18 @@ namespace LEnt {
         }
 
         template<typename T>
-        bool HasComponentPool() const { return mPoolIndices.count(Component<T>::Type) != 0; }
+        bool HasComponentPool() const 
+        {
+            LE_PROFILE_FUNCTION();
+
+            return mPoolIndices.count(Component<T>::Type) != 0; 
+        }
 
         template<typename T>
         void RegisterType() const
         {
+            LE_PROFILE_FUNCTION();
+
             LE_ASSERT(!HasComponentPool<T>(), "Component type is already registered!");
 
             mPoolIndices.emplace(Component<T>::Type, mComponentPools.size());
@@ -48,6 +57,8 @@ namespace LEnt {
         template<typename T, typename... Args>
         T& AddComponent(EntityID entity, Args&&... args)
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -58,6 +69,8 @@ namespace LEnt {
         template<typename T, typename... Args>
         T& AddOrReplaceComponent(EntityID entity, Args&&... args)
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -68,6 +81,8 @@ namespace LEnt {
         template<typename T, typename... Args>
         T& ReplaceComponent(EntityID entity, Args&&... args)
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -78,6 +93,8 @@ namespace LEnt {
         template<typename T>
         T& GetComponent(EntityID entity)
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -87,6 +104,8 @@ namespace LEnt {
         template<typename T>
         const T& GetComponent(EntityID entity) const
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -97,6 +116,8 @@ namespace LEnt {
         template<typename T>
         void RemoveComponent(EntityID entity)
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -107,6 +128,8 @@ namespace LEnt {
         template<typename T>
         bool HasComponent(EntityID entity) const
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -117,6 +140,8 @@ namespace LEnt {
         template<typename T>
         std::shared_ptr<ComponentPool<T>> GetComponentPool() const
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 
@@ -127,11 +152,15 @@ namespace LEnt {
         template<typename... T>
         std::tuple<std::shared_ptr<ComponentPool<T>>...> GetComponentPools() const
         {
+            LE_PROFILE_FUNCTION();
+
             return std::make_tuple<std::shared_ptr<ComponentPool<T>>...>(ToTupleElement<T>()...);
         }
 
         void EntityDestroyed(EntityID entity)
         {
+            LE_PROFILE_FUNCTION();
+
             for (std::shared_ptr<IComponentPool> pool : mComponentPools)
                 pool->tryDestroy(entity);
         };
@@ -139,6 +168,8 @@ namespace LEnt {
         template<typename T>
         std::shared_ptr<ComponentPool<T>> ToTupleElement() const
         {
+            LE_PROFILE_FUNCTION();
+
             if (!HasComponentPool<T>())
                 RegisterType<T>();
 

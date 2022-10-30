@@ -11,6 +11,8 @@ namespace LEnt {
     public:
         Registry()
         {
+            LE_PROFILE_FUNCTION();
+
             mEntityManager = std::make_unique<EntityManager>();
             mComponentManager = std::make_unique<ComponentManager>();
         }
@@ -35,24 +37,48 @@ namespace LEnt {
         template<typename... Component>
         ComponentView<Component...> view() const
         {
+            LE_PROFILE_FUNCTION();
+
             auto pools = mComponentManager->GetComponentPools<Component...>();
             return ComponentView<Component...>(pools);
         }
 
         template<typename Func>
-        void each(Func func) { return mEntityManager->ForEach(func); }
+        void each(Func func) 
+        {
+            LE_PROFILE_FUNCTION();
+
+            return mEntityManager->ForEach(func); 
+        }
 
         template<typename T>
-        bool all_of(EntityID entity) const { return mComponentManager->HasComponent<T>(entity); }
+        bool all_of(EntityID entity) const 
+        {
+            LE_PROFILE_FUNCTION();
+
+            return mComponentManager->HasComponent<T>(entity);
+        }
 
         template<typename T>
-        T& get(EntityID entity) { return mComponentManager->GetComponent<T>(entity); }
+        T& get(EntityID entity)
+        {
+            LE_PROFILE_FUNCTION();
+
+            return mComponentManager->GetComponent<T>(entity);
+        }
         template<typename T>
-        const T& get(EntityID entity) const { return mComponentManager->GetComponent<T>(entity); }
+        const T& get(EntityID entity) const
+        {
+            LE_PROFILE_FUNCTION();
+
+            return mComponentManager->GetComponent<T>(entity); 
+        }
 
         template<typename... Components>
         void clear()
         {
+            LE_PROFILE_FUNCTION();
+
             if constexpr (sizeof...(Components) == 0)
                 mEntityManager->Clear();
 

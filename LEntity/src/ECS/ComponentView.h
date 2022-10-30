@@ -22,6 +22,8 @@ namespace LEnt {
 
 		void each(std::function<void(EntityID, T&...)> function)
 		{
+			LE_PROFILE_FUNCTION();
+
 			for (EntityID entity : mValidEntities)
 			{
 				// Create tuple of components and unpack into function
@@ -32,6 +34,8 @@ namespace LEnt {
 		template<typename U>
 		U& get(EntityID entity)
 		{
+			LE_PROFILE_FUNCTION();
+
 			LE_STATIC_ASSERT(ComponentList::Contains<U>, "Template argument is not a component type in this view!");
 			LE_ASSERT(Contains(entity), "View does not contain this entity!");
 
@@ -70,6 +74,8 @@ namespace LEnt {
 
 		std::shared_ptr<IComponentPool> GetSmallestImpl(std::shared_ptr<ComponentPool<T>>... pools)
 		{
+			LE_PROFILE_FUNCTION();
+
 			usize finalPoolSize = -1;
 			std::shared_ptr<IComponentPool> pool = nullptr;
 			([&, this]
@@ -93,6 +99,8 @@ namespace LEnt {
 
 		bool ValidEntityImpl(std::shared_ptr<ComponentPool<T>>... pools)
 		{
+			LE_PROFILE_FUNCTION();
+
 			bool exists = true;
 			([&, this]
 			{
@@ -113,13 +121,20 @@ namespace LEnt {
 		template<usize index>
 		auto& ToTupleElement(EntityID entity)
 		{
+			LE_PROFILE_FUNCTION();
+
 			using ElementType = typename ComponentList::Type<index>;
 			std::shared_ptr<ComponentPool<ElementType>> pool = std::get<index>(mPools);
 			return pool->get(entity);
 		}
 
 		template <usize... Is>
-		auto GenTupleImpl(EntityID entity, std::index_sequence<Is...>) { return std::tie(ToTupleElement<Is>(entity)...); }
+		auto GenTupleImpl(EntityID entity, std::index_sequence<Is...>) 
+		{
+			LE_PROFILE_FUNCTION();
+
+			return std::tie(ToTupleElement<Is>(entity)...); 
+		}
 
 		auto GenTuple(EntityID entity) 
 		{

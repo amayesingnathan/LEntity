@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Base.h"
-#include "Reflection.h"
 
 namespace LEnt {
 
